@@ -6,6 +6,7 @@ import com.eocore.ordering.member.dto.MemberListResDto;
 import com.eocore.ordering.member.dto.MemberOrderResDto;
 import com.eocore.ordering.member.dto.MemberSaveReqDto;
 import com.eocore.ordering.member.service.MemberService;
+import com.eocore.ordering.orderItem.repository.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,12 @@ import java.util.List;
 public class MemberController
 {
     private final MemberService memberService;
+    private final OrderItemRepository orderItemRepository;
     @Autowired
-    public MemberController(MemberService memberService)
+    public MemberController(MemberService memberService, OrderItemRepository orderItemRepository)
     {
         this.memberService = memberService;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @GetMapping("/list")
