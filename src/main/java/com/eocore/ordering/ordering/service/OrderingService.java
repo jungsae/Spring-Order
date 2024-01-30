@@ -1,15 +1,16 @@
 package com.eocore.ordering.ordering.service;
 
+import com.eocore.ordering.item.domain.Item;
 import com.eocore.ordering.item.repository.ItemRepository;
 import com.eocore.ordering.member.repository.MemberRepository;
 import com.eocore.ordering.orderItem.domain.OrderItem;
+import com.eocore.ordering.orderItem.dto.OrderItemsResDto;
 import com.eocore.ordering.orderItem.repository.OrderItemRepository;
 import com.eocore.ordering.ordering.domain.OrderStatus;
 import com.eocore.ordering.ordering.domain.Ordering;
 import com.eocore.ordering.ordering.dto.OrderingDto;
 import com.eocore.ordering.ordering.dto.OrderingReqDto;
 import com.eocore.ordering.ordering.repository.OrderingRepository;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,15 +64,25 @@ public class OrderingService
                 .member(memberRepository.getReferenceById(orderingReqDto.getMemberId()))
                 .build();
         orderingRepository.save(ordering);
-
         for (OrderingReqDto.OrderItemDto orderItemDto: orderingReqDto.getOrderItems())
         {
+            Item item = itemRepository.findById(orderItemDto.getItemId()).get();
             OrderItem orderItem = OrderItem.builder()
-                    .item()
-                    .ordering()
+                    .item(item)
+                    .ordering(ordering)
                     .quantity(orderItemDto.getCount())
                     .build();
+            if (item.getStockQuantity() - orderItemDto.getCount() < 0) throw new IllegalArgumentException("재고 수량 부족");
             orderItemRepository.save(orderItem);
+            item.updateItem(item.getStockQuantity() - orderItemDto.getCount());
         }
+    }
+    @Transactional
+    public void cancelOrder(Long id)
+    {
+        Ordering ordering = this.findById(id);
+        ordering.updateStatus("CANCELED");
+        for (OrderItem orderItem: orderItemRepository.findByOrdering_Id(ordering.getId()))
+            orderItem.getItem().updateItem(orderItem.getItem().getStockQuantity() + orderItem.getQuantity());
     }
 }

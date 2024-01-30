@@ -32,4 +32,10 @@ public class Ordering
     @UpdateTimestamp
     @Column(columnDefinition = "TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedTime;
+
+    public void updateStatus(String status)
+    {
+        if (status.equals("CANCELED"))
+            this.orderStatus = OrderStatus.CANCELED;
+    }
 }

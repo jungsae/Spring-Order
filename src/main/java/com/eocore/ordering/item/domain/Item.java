@@ -33,4 +33,9 @@ public class Item
     @UpdateTimestamp
     @Column(columnDefinition = "TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedTime;
+
+    public void updateItem(int count)
+    {
+        this.stockQuantity = count;
+    }
 }

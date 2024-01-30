@@ -25,7 +25,20 @@ public class OrderingController
     @PostMapping("/new")
     public ResponseEntity<?> order(@RequestBody OrderingReqDto orderingReqDto)
     {
-        orderingService.saveOrder(orderingReqDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try
+        {
+            orderingService.saveOrder(orderingReqDto);
+            return new ResponseEntity<>("주문완료",HttpStatus.OK);
+        }catch (IllegalArgumentException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<?> orderCancel(@PathVariable Long id)
+    {
+        orderingService.cancelOrder(id);
+        return new ResponseEntity<>("ok", HttpStatus.ACCEPTED);
     }
 }
