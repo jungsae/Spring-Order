@@ -7,6 +7,10 @@ import com.eocore.ordering.member.dto.MemberListResDto;
 import com.eocore.ordering.member.dto.MemberOrderResDto;
 import com.eocore.ordering.member.dto.MemberSaveReqDto;
 import com.eocore.ordering.member.repository.MemberRepository;
+import com.eocore.ordering.orderItem.domain.OrderItem;
+import com.eocore.ordering.orderItem.dto.OrderItemsResDto;
+import com.eocore.ordering.orderItem.repository.OrderItemRepository;
+import com.eocore.ordering.orderItem.service.OrderItemService;
 import com.eocore.ordering.ordering.domain.Ordering;
 import com.eocore.ordering.ordering.dto.OrderingDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +25,12 @@ import java.util.Optional;
 public class MemberService
 {
     private final MemberRepository memberRepository;
+    private final OrderItemRepository orderItemRepository;
     @Autowired
-    public MemberService(MemberRepository memberRepository)
+    public MemberService(MemberRepository memberRepository, OrderItemRepository orderItemRepository)
     {
         this.memberRepository = memberRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     public Member findById(Long id)
@@ -95,10 +101,31 @@ public class MemberService
         List<OrderingDto> orderingDtos = new ArrayList<>();
         for (Ordering ordering: member.getOrderings())
         {
+            List<OrderItem> orderItems = orderItemRepository.findByOrdering_Id(ordering.getId());
+            List<OrderItemsResDto> orderItemsResDtos = new ArrayList<>();
+
+            for (OrderItem orderItem : orderItemRepository.findByOrdering_Id(id))
+            {
+                OrderItemsResDto orderItemsResDto = new OrderItemsResDto();
+                orderItemsResDto.setName(orderItem.getItem().getName());
+
+                List<OrderItemsResDto.ItemDto> itemDtos = new ArrayList<>();
+                OrderItemsResDto.ItemDto itemDto = new OrderItemsResDto.ItemDto();
+                itemDto.setCount(orderItem.getQuantity());
+                itemDto.setPrice(orderItem.getItem().getPrice());
+                itemDto.setTotalPrice(orderItem.getQuantity() * orderItem.getItem().getPrice());
+                itemDtos.add(itemDto);
+
+                orderItemsResDto.setItems(itemDtos);
+                orderItemsResDtos.add(orderItemsResDto);
+                orderItemsResDto.setItems(itemDtos);
+            }
+
             OrderingDto orderingDto = OrderingDto.builder()
                     .id(ordering.getId())
                     .orderStatus(ordering.getOrderStatus())
                     .createdTime(ordering.getCreatedTime())
+                    .orderItemsResDtos(orderItemsResDtos)
                     .build();
             orderingDtos.add(orderingDto);
         }

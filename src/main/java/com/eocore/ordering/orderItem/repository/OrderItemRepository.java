@@ -1,6 +1,7 @@
 package com.eocore.ordering.orderItem.repository;
 
 import com.eocore.ordering.orderItem.domain.OrderItem;
+import com.eocore.ordering.orderItem.dto.OrderItemsResDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -21,12 +21,10 @@ import java.util.List;
 public class MemberController
 {
     private final MemberService memberService;
-    private final OrderItemRepository orderItemRepository;
     @Autowired
-    public MemberController(MemberService memberService, OrderItemRepository orderItemRepository)
+    public MemberController(MemberService memberService)
     {
         this.memberService = memberService;
-        this.orderItemRepository = orderItemRepository;
     }
 
     @GetMapping("/list")

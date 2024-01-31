@@ -9,12 +9,12 @@ import java.util.List;
 public class OrderItemsResDto
 {
     private String name;
-    private int count;
     private List<ItemDto> items = new ArrayList<>();
     @Data
     public static class ItemDto
     {
-        private String name;
+        private int count;
         private int price;
+        private int totalPrice;
     }
 }
